@@ -12,9 +12,8 @@ use Illuminate\Support\Facades\Validator;
 
 class ApiController extends Controller
 {
-    public function create(Request $request)
+    public function create_user(Request $request)
     {
-
         $validation = Validator::make($request->all(),[
             'username' => ['required', 'unique:users,username'],
             'email' => ['required','email','unique:users,email'],
@@ -24,21 +23,24 @@ class ApiController extends Controller
         if ($validation->fails()){
             return response()->json(['error' => $validation->errors()->toArray()]);
         }
+
         try {
             $user = User::create([
                 'username' => $request->input('username'),
                 'email' => $request->input('email'),
                 'password' => Hash::make($request->input('password'))
             ]);
+            $token = $user->createToken('auth_token')->plainTextToken;
             return response()->json([
-                'data'=> $user
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+                'user_created'=> $user
             ]);
         }catch (\Exception $ex){
             return response()->json([
                 'data' => $ex
             ]);
         }
-
     }
 
     public function listUsers()
@@ -70,11 +72,11 @@ class ApiController extends Controller
         }
     }
 
-    public function login(Request $request)
+    public function login_user(Request $request)
     {
         $validation = Validator::make($request->all(),[
-            'username' => ['required', 'unique:users,username'],
-            'email' => ['required','email','unique:users,email'],
+            'username' => [],
+            'email' => ['required','email'],
             'password' => ['required','min:6']
         ]);
 
@@ -84,11 +86,25 @@ class ApiController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)){
-            return $credentials;
+        if (!Auth::attempt($credentials)){
+            return response()->json([
+                'message' => 'Invalid credentials'
+            ], 401);
         }
+        $user = User::where('email', $request['email'])->firstOrFail();
+        $user->status = 1;
 
-        return 'Login Login details are not valid';
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+        ]);
+    }
+
+    public function logout_user()
+    {
+
     }
 
     public function show_message($sender, $receiver)
@@ -96,5 +112,13 @@ class ApiController extends Controller
         $messages  = Chat::where([['sender_id', '=', $sender], ['receiver_id', '=', $receiver]])->orWhere([['sender_id', '=', $receiver], ['receiver_id', '=', $sender]])->limit(10)->orderBy('id', 'desc')-> get();
 
         return response()->json($messages, 200);
+    }
+
+    public function auth_users(Request $request)
+    {
+
+        return response()->json([
+            $request->user()
+        ]);
     }
 }
