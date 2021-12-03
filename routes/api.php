@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContactsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,14 +17,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/login', [ApiController::class, 'login_user']);
-Route::get('/authenticated', [ApiController::class, 'auth_users']);
 
-Route::post('/register',[ApiController::class, 'create_user']);
-Route::get('/list',[ApiController::class, 'listUsers']);
+// Protected Routes
+
+Route::group(['middleware'=>['auth:sanctum']], function (){
+    Route::get('/list',[ApiController::class, 'listUsers']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/authenticated', [ApiController::class, 'auth_users']);
+    Route::get('/conversations/{id}',[ApiController::class, 'sent_received_messages']);
+});
+
+// Public Routes
+Route::post('/login', [AuthController::class, 'login_user']);
+Route::post('/register',[AuthController::class, 'register']);
+
+
 Route::post('/message', [ApiController::class, 'conversation']);
+Route::post('/send', [ContactsController::class, 'send']);
 Route::get('/collect_message/{sender}/{receiver}', [ApiController::class, 'show_message']);

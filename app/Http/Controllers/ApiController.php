@@ -6,22 +6,27 @@ use App\Models\Chat;
 use App\Models\Chatter;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class ApiController extends Controller
 {
-    public function create_user(Request $request)
+    /*public function create_user(Request $request)
     {
         $validation = Validator::make($request->all(),[
             'username' => ['required', 'unique:users,username'],
             'email' => ['required','email','unique:users,email'],
-            'password' => ['required','min:6']
+            'password' => ['required','min:6', Password::defaults()]
         ]);
 
         if ($validation->fails()){
-            return response()->json(['error' => $validation->errors()->toArray()]);
+            $data = $validation->errors()->toArray();
+            $message = 'An error occured';
+            $statusCode = 403;
+            return httpResponse($data, $message, $statusCode);
         }
 
         try {
@@ -30,41 +35,41 @@ class ApiController extends Controller
                 'email' => $request->input('email'),
                 'password' => Hash::make($request->input('password'))
             ]);
+            // Auth::login($user);
             $token = $user->createToken('auth_token')->plainTextToken;
-            return response()->json([
+            $message = 'User created successfully';
+            $statusCode = 201;
+            $data = [
                 'access_token' => $token,
                 'token_type' => 'Bearer',
                 'user_created'=> $user
-            ]);
+            ];
+            return httpResponse($data, $message, $statusCode);
         }catch (\Exception $ex){
             return response()->json([
                 'data' => $ex
             ]);
         }
-    }
+    }*/
 
     public function listUsers()
     {
         $user = User::all();
-        return response()->json(
-            $user
-        );
+        return httpResponse($user,'List of all users',200);
         //return $user->toJson();
     }
 
     public function conversation(Request $request)
     {
-        $message = new Chat();
+        $chat = new Chat();
 
-        $message->sender_id = $request->input('sender_id');
-        $message->receiver_id = $request->input('receiver_id');
-        $message->message = $request->input('message');
+        $chat->sender_id = $request->input('sender_id');
+        $chat->receiver_id = $request->input('receiver_id');
+        $chat->message = $request->input('message');
 
         try {
-            $message->save();
-            return response()->json([
-               $message
-            ],200);
+            $chat->save();
+            return httpResponse($chat,'Saved', 201);
         }catch (\Exception $ex){
             return response()->json([
                 $ex
@@ -72,53 +77,33 @@ class ApiController extends Controller
         }
     }
 
-    public function login_user(Request $request)
-    {
-        $validation = Validator::make($request->all(),[
-            'username' => [],
-            'email' => ['required','email'],
-            'password' => ['required','min:6']
-        ]);
 
-        if ($validation->fails()){
-            return response()->json(['error' => $validation->errors()->toArray()]);
-        }
-
-        $credentials = $request->only('email', 'password');
-
-        if (!Auth::attempt($credentials)){
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401);
-        }
-        $user = User::where('email', $request['email'])->firstOrFail();
-        $user->status = 1;
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ]);
-    }
-
-    public function logout_user()
-    {
-
-    }
 
     public function show_message($sender, $receiver)
     {
         $messages  = Chat::where([['sender_id', '=', $sender], ['receiver_id', '=', $receiver]])->orWhere([['sender_id', '=', $receiver], ['receiver_id', '=', $sender]])->limit(10)->orderBy('id', 'desc')-> get();
 
-        return response()->json($messages, 200);
+        return httpResponse($messages, '', 200);
     }
 
     public function auth_users(Request $request)
     {
-
+        $users = Auth::user();
         return response()->json([
-            $request->user()
+           $users
         ]);
     }
+
+    public function sent_received_messages($id)
+    {
+        $user = User::where('id', '!=', Auth::id())->get()->toArray();
+        $messages = Chat::all();
+
+
+        foreach ($user as $each){
+            
+        }
+        $messages_exchanged  = Chat::where([['sender_id', '=', $id]])->orWhere([['receiver', '=', $id]])->limit(10)->orderBy('id', 'desc')->get();
+    }
+
 }
