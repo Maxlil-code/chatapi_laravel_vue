@@ -37,7 +37,7 @@ class AuthController extends Controller
             $message = 'User created successfully';
             $statusCode = 201;
             $data = [
-                'access_token' => $token,
+                'token' => $token,
                 'token_type' => 'Bearer',
                 'user_created'=> $user
             ];
@@ -87,11 +87,12 @@ class AuthController extends Controller
         return httpResponse($data, $message, $statusCode);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         // $user = $request->user();
         // $user->tokens()->where('id', $user->currentAccessToken()->id)->delete();
-
+        $user = User::where('email', $request['email'])->firstOrFail();
+        $user->status = 0;
         auth()->user()->tokens()->delete();
         $data = [];
         return  httpResponse($data, 'Logout Successful', 200);
