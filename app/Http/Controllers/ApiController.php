@@ -54,7 +54,7 @@ class ApiController extends Controller
 
     public function listUsers()
     {
-        $user = User::where('id','!==', auth()->id())->get();
+        $user = User::where('id','!==', auth()->id())->paginate(10)->get();
         return httpResponse($user,'List of all users',200);
         //return $user->toJson();
     }
@@ -81,7 +81,7 @@ class ApiController extends Controller
 
     public function show_message($sender, $receiver)
     {
-        $messages  = Chat::where([['sender_id', '=', $sender], ['receiver_id', '=', $receiver]])->orWhere([['sender_id', '=', $receiver], ['receiver_id', '=', $sender]])->limit(10)->orderBy('id', 'desc')-> get();
+        $messages  = Chat::where([['sender_id', '=', $sender], ['receiver_id', '=', $receiver]])->orWhere([['sender_id', '=', $receiver], ['receiver_id', '=', $sender]])->orderBy('id', 'desc')->paginate(10)->get();
 
         return httpResponse($messages, '', 200);
     }

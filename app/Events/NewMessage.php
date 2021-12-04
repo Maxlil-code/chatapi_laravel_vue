@@ -42,3 +42,5 @@ class NewMessage implements ShouldBroadcast
         return ["message" => $this->message];
     }
 }
+
+

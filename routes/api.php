@@ -39,3 +39,13 @@ Route::post('/register',[AuthController::class, 'register']);
 
 Route::post('/message', [ApiController::class, 'conversation']);
 Route::get('/collect_message/{sender}/{receiver}', [ApiController::class, 'show_message']);
+
+
+
+//api/send  (For broadcasting and saving messages params: receiver_id, text) POST
+//api/login  (For login params: email, password) POST
+//api/logout POST
+//api/register  (params username, email, password)  POST
+//api/list      (Listing of all other users except logged in user) GET
+//api/authenticated      (to know the currently authenticated user) GET
+//collect_message/{sender}/{receiver}   (Shows all messages exchanged by 2 ids) GET
