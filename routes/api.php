@@ -29,6 +29,7 @@ Route::group(['middleware'=>['auth:sanctum']], function (){
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/authenticated', [ApiController::class, 'auth_users']);
     Route::get('/conversations/{id}',[ApiController::class, 'sent_received_messages']);
+    Route::post('/send', [ContactsController::class, 'send']);
 });
 
 // Public Routes
@@ -37,5 +38,4 @@ Route::post('/register',[AuthController::class, 'register']);
 
 
 Route::post('/message', [ApiController::class, 'conversation']);
-Route::post('/send', [ContactsController::class, 'send']);
 Route::get('/collect_message/{sender}/{receiver}', [ApiController::class, 'show_message']);

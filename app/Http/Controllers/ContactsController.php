@@ -11,15 +11,17 @@ class ContactsController extends Controller
 {
     public function send(Request $request)
     {
-        /*$message = Chat::create([
-            'sender_id' => auth()->id(),
+        //return response()->json(Auth::id());
+
+        $message = Chat::create([
+            'sender_id' => Auth::id(),
             'receiver_id' => $request->input('contact_id'),
             'message' => $request->input('text')
         ]);
-        broadcast(new NewMessage($message));*/
+        broadcast(new NewMessage($message));
 
 
 
-        return response()->json(Auth::check());
+        return httpResponse($message, 'succesfully sent', '201');
     }
 }

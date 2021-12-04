@@ -15,10 +15,11 @@ class NewMessage implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $message;
+
     /**
      * Create a new event instance.
      *
-     * @return void
+     * @param Chat $message
      */
     public function __construct(Chat $message)
     {

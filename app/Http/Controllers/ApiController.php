@@ -54,7 +54,7 @@ class ApiController extends Controller
 
     public function listUsers()
     {
-        $user = User::all();
+        $user = User::where('id','!==', auth()->id())->get();
         return httpResponse($user,'List of all users',200);
         //return $user->toJson();
     }
@@ -101,7 +101,7 @@ class ApiController extends Controller
 
 
         foreach ($user as $each){
-            
+
         }
         $messages_exchanged  = Chat::where([['sender_id', '=', $id]])->orWhere([['receiver', '=', $id]])->limit(10)->orderBy('id', 'desc')->get();
     }
