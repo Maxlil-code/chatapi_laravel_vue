@@ -22,7 +22,7 @@ class AuthController extends Controller
         if ($validation->fails()){
             $data = $validation->errors()->toArray();
             $message = 'An error occured';
-            $statusCode = 403;
+            $statusCode = 422;
             return httpResponse($data, $message, $statusCode);
         }
 
@@ -60,7 +60,7 @@ class AuthController extends Controller
         if ($validation->fails()){
             $data = $validation->errors()->toArray();
             $message = '';
-            $statusCode = 401;
+            $statusCode = 422;
             return httpResponse($data, $message, $statusCode);
         }
 
@@ -69,7 +69,7 @@ class AuthController extends Controller
         if (!Auth::attempt($credentials)){
             $data = $credentials;
             $message = 'Invalid credentials';
-            $statusCode = 403;
+            $statusCode = 422;
             return httpResponse($data, $message, $statusCode);
         }
         $user = User::where('email', $request['email'])->firstOrFail();
