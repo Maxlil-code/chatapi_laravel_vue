@@ -16,7 +16,7 @@ class AuthController extends Controller
         $validation = Validator::make($request->all(),[
             'username' => ['required', 'unique:users,username'],
             'email' => ['required','email','unique:users,email'],
-            'password' => ['required','min:6', Password::defaults()]
+            'password' => ['required', Password::defaults()]
         ]);
 
         if ($validation->fails()){
@@ -37,9 +37,8 @@ class AuthController extends Controller
             $message = 'User created successfully';
             $statusCode = 201;
             $data = [
-                'token' => $token,
-                'token_type' => 'Bearer',
-                'user_created'=> $user
+                'user'=> $user,
+                'token' => $token
             ];
             return httpResponse($data, $message, $statusCode);
         }catch (\Exception $ex){
@@ -78,7 +77,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
         $data = [
-            'authenticated user' => $user,
+            'user' => $user,
             'token' => $token
         ];
         $message = 'Logged In successfully';
@@ -98,7 +97,7 @@ class AuthController extends Controller
         return  httpResponse($data, 'Logout Successful', 200);
     }
 
-    public function login(Request $request)
+    /*public function login(Request $request)
     {
         $request->validate([
             'email' => 'required',
@@ -112,5 +111,5 @@ class AuthController extends Controller
         }
 
         return 'Login Login details are not valid';
-    }
+    }*/
 }

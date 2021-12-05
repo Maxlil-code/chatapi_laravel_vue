@@ -81,7 +81,7 @@ class ApiController extends Controller
 
     public function show_message($sender, $receiver)
     {
-        $messages  = Chat::where([['sender_id', '=', $sender], ['receiver_id', '=', $receiver]])->orWhere([['sender_id', '=', $receiver], ['receiver_id', '=', $sender]])->orderBy('id', 'desc')->paginate(10)->get();
+        $messages  = Chat::where([['sender_id', '=', $sender], ['receiver_id', '=', $receiver]])->orWhere([['sender_id', '=', $receiver], ['receiver_id', '=', $sender]])->orderBy('id', 'asc')->paginate(10)->get();
 
         return httpResponse($messages, '', 200);
     }
