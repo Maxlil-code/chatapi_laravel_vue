@@ -54,7 +54,7 @@ class ApiController extends Controller
 
     public function listUsers()
     {
-        $user = User::where('id','!==', auth()->id())->paginate(10)->get();
+        $user = User::where('id','<>', auth()->user()->id)->paginate(10);
         return httpResponse($user,'List of all users',200);
         //return $user->toJson();
     }
