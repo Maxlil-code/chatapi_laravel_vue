@@ -14,4 +14,8 @@ class Chat extends Model
         'receiver_id',
         'message'
     ];
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id')->select(['id', 'name']);
+    }
 }
